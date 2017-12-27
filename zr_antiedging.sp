@@ -36,13 +36,13 @@ public Plugin:myinfo =
 	name = "SM Anti Edging",
 	author = "Franc1sco franug",
 	description = "",
-	version = "1.1",
+	version = "1.1.1",
 	url = "http://steamcommunity.com/id/franug"
 };
 
 public OnPluginStart()
 {
-	CreateConVar("sm_antiedging_version", "1.0", "Version", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
+	CreateConVar("sm_antiedging_version", "1.0", "Version", FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 	h_stuck = CreateConVar("sm_antiedging_unstuck", "1", "Enable/disable auto unstuck");
 	
 	g_stuck = GetConVarBool(h_stuck);
@@ -121,6 +121,7 @@ public Action:TimerWait(Handle:timer, Handle:data)
 	vecOrigin[1]		= ReadPackFloat(data);
 	vecOrigin[2]		= ReadPackFloat(data);
 	
+	if(!IsValidClient(iClient)) return;
 	
 	GetClientAbsOrigin(iClient, vecOriginAfter);
 	
