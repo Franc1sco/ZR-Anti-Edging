@@ -1,6 +1,6 @@
 /*  SM Anti Edging
  *
- *  Copyright (C) 2017 Francisco 'Franc1sco' García
+ *  Copyright (C) 2017-2021 Francisco 'Franc1sco' García
  * 
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -29,14 +29,16 @@ new Float:RadiusSize = 200.0;
 new Float:Ground_Velocity[3] = {0.0, 0.0, -300.0};
 
 new Handle:h_stuck;
+new Handle:h_angle;
 new bool:g_stuck;
+new bool:g_angle;
 
 public Plugin:myinfo =
 {
 	name = "SM Anti Edging",
 	author = "Franc1sco franug",
 	description = "",
-	version = "1.1.1",
+	version = "1.2",
 	url = "http://steamcommunity.com/id/franug"
 };
 
@@ -44,15 +46,20 @@ public OnPluginStart()
 {
 	CreateConVar("sm_antiedging_version", "1.0", "Version", FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 	h_stuck = CreateConVar("sm_antiedging_unstuck", "1", "Enable/disable auto unstuck");
+	h_angle = CreateConVar("sm_antiedging_angle", "1", "Enable/disable copy the angle of zombie when teleport");
 	
 	g_stuck = GetConVarBool(h_stuck);
+	g_angle = GetConVarBool(h_angle);
+	
 	HookConVarChange(h_stuck, OnConVarChanged);
+	HookConVarChange(h_angle, OnConVarChanged);
 	
 }
 
 public OnConVarChanged(Handle:convar, const String:oldValue[], const String:newValue[])
 {
-	g_stuck = bool:StringToInt(newValue);
+	if(convar == h_stuck)g_stuck = bool:StringToInt(newValue);
+	else if(convar == h_angle)g_angle = bool:StringToInt(newValue);
 }
 
 public ZR_OnClientInfected(client, attacker, bool:motherInfect, bool:respawnOverride, bool:respawn)
@@ -65,7 +72,10 @@ public ZR_OnClientInfected(client, attacker, bool:motherInfect, bool:respawnOver
 	
 	vec[2] += 20.0;
 	
-	TeleportEntity(client, vec, ang, NULL_VECTOR);
+	if(g_angle)
+		TeleportEntity(client, vec, ang, NULL_VECTOR);
+	else
+		TeleportEntity(client, vec, NULL_VECTOR, NULL_VECTOR);
 	
 	if(g_stuck)
 	{
